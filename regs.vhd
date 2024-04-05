@@ -56,7 +56,7 @@ dout1 <= registers(to_integer(unsigned(id1)));
 dout2 <= registers(to_integer(unsigned(id2)));             
 
 
-process(clk, en,rst) 
+process(clk) 
 
 begin 
 

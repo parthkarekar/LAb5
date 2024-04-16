@@ -51,8 +51,6 @@ begin
 
   if (rising_edge (clk1) ) then 
     
-    if( ld = '1') then 
-    
         if ( en1 = '1') then 
         
             if (wr_en1 = '1') then 
@@ -76,8 +74,6 @@ begin
         end if;
         
     end if; 
-      
-  end if;
     
  end process; 
  

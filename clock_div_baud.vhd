@@ -31,16 +31,16 @@ use IEEE.NUMERIC_STD.ALL;
 --library UNISIM;
 --use UNISIM.VComponents.all;
 
-entity clock_div is
+entity clock_div_baud is
 Port ( 
 
 clk: in std_logic;
 en: out std_logic 
 
 );
-end clock_div;
+end clock_div_baud;
 
-architecture Behavioral of clock_div is
+architecture Behavioral of clock_div_baud is
 
 signal cnt: std_logic_vector (26 downto 0) := (others => '0'); 
 

@@ -33,198 +33,157 @@ use IEEE.NUMERIC_STD.ALL;
 
 entity my_alu is
     Port ( A : in STD_LOGIC_VECTOR (15 downto 0);
-           B : in STD_LOGIC_VECTOR (15 downto 0);
-           C : out STD_LOGIC_VECTOR (15 downto 0);
-           opcode: in std_logic_vector (3 downto 0);
-           lda : in STD_LOGIC;
-           ldb : in STD_LOGIC;
-           ldop : in STD_LOGIC;
-           clk: in std_logic;
-           en: std_logic; 
-           rst: in std_logic
-           
-           );
+         B : in STD_LOGIC_VECTOR (15 downto 0);
+         C : out STD_LOGIC_VECTOR (15 downto 0);
+         opcode: in std_logic_vector (3 downto 0);
+         clk: in std_logic;
+         en: std_logic
+        );
 end my_alu;
 
 architecture Behavioral of my_alu is
 
-signal Atemp, Btemp, op :std_logic_vector (3 downto 0) := (others => '0');
 
 begin
 
 
+    process(clk)
+    begin
 
-process( A, B, opcode,clk,rst,en)
-begin 
+        if(rising_edge(clk)) then
 
-if (rising_edge(clk)) then 
-
-  if(en = '1') then 
-
-    if (lda = '1') then 
-
-        Atemp <= A;
-
-    end if; 
-
-    if (ldb = '1') then 
-
-        Btemp <= B; 
-
-    end if;
+            if( en = '1') then
 
 
-    if (ldop = '1') then 
+                case (opcode) is
 
-        op <= opcode; 
-    
-    end if; 
+                    when "0000" =>
+
+                        C <= std_logic_vector ( unsigned (A) + unsigned(B));
+
+                    when "0001" =>
+
+                        C <= std_logic_vector ( unsigned (A) - unsigned(B));
+
+                    when "0010" =>
+
+                        C <= std_logic_vector ( unsigned (A) + 1 );
+
+                    when "0011" =>
+
+                        C <= std_logic_vector (unsigned( A)-1);
+
+                    when "0100" =>
+
+                        C <= std_logic_vector ( 0 - unsigned( A));
+
+
+                    when "0101" =>
+
+                        C <= std_logic_vector(unsigned(A) sll 1);
+
+
+                    when "0110" =>
+
+                        C <= std_logic_vector(unsigned(A) srl 1);
+
+                    when "0111" =>
+
+                        C <= std_logic_vector (shift_right(signed(A ),1));
+
+                    when "1000" =>
+
+                        C <= A and B;
+
+                    when "1001" =>
+
+                        C <= A or B;
+
+                    when "1010" =>
+
+                        C <= A xor B;
+
+                    when "1011" => --11
+
+                        if( to_integer(signed(A)) < to_integer(signed(B))) then
+
+                            C <= (others => '0');
+
+                        else
+
+                            C <= std_logic_vector(1);
+
+                        end if;
 
 
 
-if (rst = '1') then 
+                    when "1100" => --12
 
-    C <= (others => '0');
-    Atemp <= (others => '0');
-    Btemp <= (others => '0');
-    op <= (others => '0');
-    
-    
-end if; 
+                        if( to_integer(signed(A)) > to_integer(signed(B))) then
+
+                            C <= (others => '0');
+
+                        else
+
+                            C <= std_logic_vector(1);
+
+                        end if;
 
 
 
-    
 
-case (op) is 
+                    when "1101" => --13
 
-    when "0000" =>   
-    
-    C <= std_logic_vector ( unsigned (Atemp) + unsigned(Btemp));
-    
-    when "0001" =>
-    
-    C <= std_logic_vector ( unsigned (Atemp) - unsigned(Btemp));
-    
-    when "0010" => 
-    
-    C <= std_logic_vector ( unsigned (Atemp) + 1 );
-    
-    when "0011" =>
-    
-    C <= std_logic_vector (unsigned( Atemp)-1);
-    
-    when "0100" =>
-    
-    C <= std_logic_vector ( 0 - unsigned( Atemp));
-    
-    
-    when "0101" => 
-       
-    C <= std_logic_vector(unsigned(Atemp) sll 1); 
-        
-        
-    when "0110" => 
-    
-    C <= std_logic_vector(unsigned(Atemp) srl 1);
-        
-    when "0111" =>  
-    
-    C <= std_logic_vector (shift_right(signed(Atemp ),1));
-        
-    when "1000" => 
-    
-    C <= Atemp and Btemp;
-        
-    when "1001" => 
-    
-    C <= Atemp or Btemp;
-        
-    when "1010" =>
-    
-    C <= Atemp xor Btemp;
-        
-    when "1011" => --11
-    
-        if( to_integer(signed(Atemp)) < to_integer(signed(Btemp))) then 
-        
-            C <= (others => '0');
-            
-        else 
-        
-            C <= std_logic_vector(1);
-            
-        end if; 
-    
-    
-        
-    when "1100" => --12
-    
-        if( to_integer(signed(Atemp)) > to_integer(signed(Btemp))) then 
-        
-            C <= (others => '0');
-            
-        else 
-        
-            C <= std_logic_vector(1);
-            
-        end if; 
-    
-    
-        
-        
-    when "1101" => --13
-    
-       if ( Atemp = Btemp) then 
-            
-            C <= (others => '0');
-            
-       else 
-       
-            C <= std_logic_vector(1);
-            
-       end if; 
-            
-        
-    when "1110" => 
-    
-        if (unsigned(Atemp) < unsigned(Btemp)) then 
-            
-            C <= (others => '0');
-                
-        else 
-             
-            C <= std_logic_vector(1);
-    
-        end if; 
-        
-    when "1111" =>
-    
-        if(unsigned(Atemp) > unsigned(Btemp)) then 
-            
-            C <= (others => '0');
-            
-        else 
-        
-            C <= std_logic_vector(1);
-            
-        end if; 
-    
-        
-        
-    when others =>
-    
-        C <= "0000";
-        
-        
-end case;
+                        if ( A = B ) then
 
-end if;  
- 
-end if; 
-      
-end process;    
-        
-   
+                            C <= (others => '0');
+
+                        else
+
+                            C <= std_logic_vector(1);
+
+                        end if;
+
+
+                    when "1110" =>
+
+                        if (unsigned(A) < unsigned(B)) then
+
+                            C <= (others => '0');
+
+                        else
+
+                            C <= std_logic_vector(1);
+
+                        end if;
+
+                    when "1111" =>
+
+                        if(unsigned(A) > unsigned(B)) then
+
+                            C <= (others => '0');
+
+                        else
+
+                            C <= std_logic_vector(1);
+
+                        end if;
+
+
+
+                    when others =>
+
+                        C <= "0000";
+
+
+                end case;
+
+            end if;
+
+        end if;
+
+    end process;
+
+
 
 end Behavioral;
